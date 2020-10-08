@@ -1,5 +1,6 @@
 package com.fincatto.springbootgcp;
 
+import com.google.cloud.storage.Bucket;
 import com.google.pubsub.v1.PubsubMessage;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -14,9 +15,11 @@ public class Consumer implements ApplicationRunner {
     private static final Logger LOGGER = LoggerFactory.getLogger(Consumer.class);
     private static final String SUBSCRITION = "teste-pull";
     private final PubSubTemplate template;
+    private final Bucket bucket;
 
-    public Consumer(PubSubTemplate template) {
+    public Consumer(final PubSubTemplate template, final Bucket bucket) {
         this.template = template;
+        this.bucket = bucket;
     }
 
     @Override
@@ -24,6 +27,7 @@ public class Consumer implements ApplicationRunner {
         this.template.subscribe(SUBSCRITION, basicAcknowledgeablePubsubMessage -> {
             final PubsubMessage message = basicAcknowledgeablePubsubMessage.getPubsubMessage();
             LOGGER.info("[{}] {} - {}", message.getMessageId(), message.getData().toStringUtf8(), message.getAttributesMap());
+            bucket.get(message.getAttributesOrThrow("name")).delete();
             basicAcknowledgeablePubsubMessage.ack();
         });
     }
