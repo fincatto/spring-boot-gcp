@@ -17,7 +17,7 @@ public class Consumer implements ApplicationRunner {
     private final PubSubTemplate template;
     private final Bucket bucket;
 
-    public Consumer(final PubSubTemplate template, final Bucket bucket) {
+    public Consumer(final Bucket bucket, final PubSubTemplate template) {
         this.template = template;
         this.bucket = bucket;
     }
